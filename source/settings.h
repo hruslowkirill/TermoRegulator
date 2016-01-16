@@ -7,7 +7,7 @@
 typedef struct
 {
 	float temp;
-	uint8_t d;
+	float d;
 	uint8_t direction;	
 }Settings;
 

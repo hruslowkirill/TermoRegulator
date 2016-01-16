@@ -69,6 +69,9 @@ int main()
 	LCD_Clear_Display();
 	
 
+	DS_Init(DSBIT1);
+	DS_Init(DSBIT2);
+	DS_Init(DSBIT3);
 	
 	while (1)
 	{
@@ -106,21 +109,21 @@ void DoWork()
 			//_delay_ms(1);
 			return;
 		}
-	LCD_Clear_Display();
+	//LCD_Clear_Display();
 
 	
-	LCD_printStr("Waiting...");
+	//LCD_printStr("Waiting...");
 	//return ;
-	DS_Init(DSBIT1);
+	//DS_Init(DSBIT1);
 		float t1 = DS_getFloatTemperature(DSBIT1);
 
 
-		DS_Init(DSBIT2);
+		//DS_Init(DSBIT2);
 		float t2 = DS_getFloatTemperature(DSBIT2);
 
 
-		DS_Init(DSBIT1);
-		float t3 = DS_getFloatTemperature(DSBIT1);
+		//DS_Init(DSBIT3);
+		float t3 = DS_getFloatTemperature(DSBIT3);
 
 		HandleRelay(&setting1, t1, RELAY1);
 		HandleRelay(&setting2, t2, RELAY2);
@@ -212,7 +215,7 @@ void ShowSettings()
 	if ((blinker)||(settings_item2!=2))
 	{
 		LCD_2buffer_Move_Cursor(9);
-		LCD_2buffer_Print_Number(settings->d);
+		LCD_2buffer_Show_FloatTemperature1(settings->d);
 	}
 	if ((blinker)||(settings_item2!=3))
 	{
@@ -268,7 +271,7 @@ void BTN1_Pressed()
 			}
 			if (settings_item2==2)
 			{
-				settings->d--;
+				settings->d-=0.1;
 			}
 			if (settings_item2==3)
 			{
@@ -301,7 +304,7 @@ void BTN2_Pressed()
 			}
 			if (settings_item2==2)
 			{
-				settings->d++;
+				settings->d+= 0.1;
 			}
 			if (settings_item2==3)
 			{
@@ -344,6 +347,10 @@ void BTN1_Long_Pressed()
 			{
 				settings->temp -= 5;
 			}
+			/*if (settings_item2==2)
+			{
+				settings->d -= 1;
+			}*/
 		break;
 	}
 }
@@ -357,6 +364,10 @@ void BTN2_Long_Pressed()
 			{
 				settings->temp += 5;
 			}
+			/*if (settings_item2==2)
+			{
+				settings->d += 1;
+			}*/
 		break;
 	}
 }

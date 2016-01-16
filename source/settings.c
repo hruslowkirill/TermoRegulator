@@ -1,8 +1,8 @@
 #include "settings.h"
 
-Settings EEMEM EEMEMsetting1 = {20.5, 5, 0};
-Settings EEMEM EEMEMsetting2 = {20.5, 5, 0};
-Settings EEMEM EEMEMsetting3 = {20.5, 5, 0};
+Settings EEMEM EEMEMsetting1 = {20.5, 1.0, 0};
+Settings EEMEM EEMEMsetting2 = {20.5, 1.0, 0};
+Settings EEMEM EEMEMsetting3 = {20.5, 1.0, 0};
 
 extern Settings setting1;
 extern Settings setting2;
