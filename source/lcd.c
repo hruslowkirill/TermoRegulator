@@ -82,14 +82,14 @@ uint8_t LCD_pointer = 0;
 	LCD_Show_Byte(d&0xFF);
 }*/
 
-char LCD_getChar(byte d)
+/*char LCD_getChar(byte d)
 {
 	if (d<10)
 	{
 		return d+'0';
 	}
 	return d+'A'-10;
-}
+}*/
 
 void LCD_Init(void)
 {
@@ -139,29 +139,9 @@ void LCD_Move_Cursor(byte position)
 	LCD_Send_Instruction(p);
 }
 
-
-
-void LCD_Send_Data(byte q)
+void LCD_Send_Data_Instruction(byte q)
 {
-	Select_DataRegister;
 	Write_Lcd;	
-	CONTROL_PORT&= 0xF0;
-	CONTROL_PORT|= (q>>4)&0x0F;
-	Set_Enable;
-	_delay_ms(1);
-	Clear_Enable;
-	_delay_us(500);
-	CONTROL_PORT&= 0xF0;
-	CONTROL_PORT|= q&0x0F;
-	Set_Enable;
-	_delay_ms(1);
-	Clear_Enable;
-}
-
-void LCD_Send_Instruction(byte q)
-{
-	Select_InstructionRegister;
-	Write_Lcd;
 	CONTROL_PORT&= 0xF0;
 	CONTROL_PORT|= (q>>4)&0x0F;
 	Set_Enable;
@@ -173,6 +153,43 @@ void LCD_Send_Instruction(byte q)
 	Set_Enable;
 	_delay_ms(1);
 	Clear_Enable;
+}
+
+
+void LCD_Send_Data(byte q)
+{
+	Select_DataRegister;
+	/*Write_Lcd;	
+	CONTROL_PORT&= 0xF0;
+	CONTROL_PORT|= (q>>4)&0x0F;
+	Set_Enable;
+	_delay_ms(1);
+	Clear_Enable;
+	_delay_us(500);
+	CONTROL_PORT&= 0xF0;
+	CONTROL_PORT|= q&0x0F;
+	Set_Enable;
+	_delay_ms(1);
+	Clear_Enable;*/
+	LCD_Send_Data_Instruction(q);
+}
+
+void LCD_Send_Instruction(byte q)
+{
+	Select_InstructionRegister;
+	/*Write_Lcd;
+	CONTROL_PORT&= 0xF0;
+	CONTROL_PORT|= (q>>4)&0x0F;
+	Set_Enable;
+	_delay_ms(1);
+	Clear_Enable;
+	_delay_ms(6);
+	CONTROL_PORT&= 0xF0;
+	CONTROL_PORT|= q&0x0F;
+	Set_Enable;
+	_delay_ms(1);
+	Clear_Enable;*/
+	LCD_Send_Data_Instruction(q);
 	_delay_ms(6);	
 }
 

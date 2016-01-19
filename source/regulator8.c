@@ -69,9 +69,6 @@ int main()
 	LCD_Clear_Display();
 	
 
-	DS_Init(DSBIT1);
-	DS_Init(DSBIT2);
-	DS_Init(DSBIT3);
 	
 	while (1)
 	{
@@ -103,7 +100,7 @@ void DoWork()
 {
 
 	//LCD_Clear_Display();
-	if (iterations%12000!=0)
+	if (iterations%500!=0)
 		{
 			iterations++;
 			//_delay_ms(1);
@@ -115,6 +112,10 @@ void DoWork()
 	//LCD_printStr("Waiting...");
 	//return ;
 	//DS_Init(DSBIT1);
+	DS_Init(DSBIT1);
+	DS_Init(DSBIT2);
+	DS_Init(DSBIT3);
+
 		float t1 = DS_getFloatTemperature(DSBIT1);
 
 
@@ -347,10 +348,10 @@ void BTN1_Long_Pressed()
 			{
 				settings->temp -= 5;
 			}
-			/*if (settings_item2==2)
+			if (settings_item2==2)
 			{
-				settings->d -= 1;
-			}*/
+				settings->d -= 5;
+			}
 		break;
 	}
 }
@@ -364,10 +365,11 @@ void BTN2_Long_Pressed()
 			{
 				settings->temp += 5;
 			}
-			/*if (settings_item2==2)
+			if (settings_item2==2)
 			{
-				settings->d += 1;
-			}*/
+				settings->d += 5;
+			}
+
 		break;
 	}
 }
@@ -379,12 +381,13 @@ void BTN3_Long_Pressed()
 	{
 		current_status = STATUS_MAIN_MAENU;
 		sub_current_status = 0;
-		iterations=0;
+		
 	}else
 	{
 		current_status = STATUS_DEFAULT;
-		iterations=0;
+		
 	}
+	iterations=0;
 }
 
 void BTN_Init()
