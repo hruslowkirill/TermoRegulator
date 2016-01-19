@@ -2803,44 +2803,44 @@ void HandleRelay(Settings * setting, float temp, uint8_t relay)
 		}
 	}else
 	{
-		if (temp<(setting->temp-setting->d))
-     f10:	68 81       	ld	r22, Y
-     f12:	79 81       	ldd	r23, Y+1	; 0x01
-     f14:	8a 81       	ldd	r24, Y+2	; 0x02
-     f16:	9b 81       	ldd	r25, Y+3	; 0x03
-     f18:	2c 81       	ldd	r18, Y+4	; 0x04
-     f1a:	3d 81       	ldd	r19, Y+5	; 0x05
-     f1c:	4e 81       	ldd	r20, Y+6	; 0x06
-     f1e:	5f 81       	ldd	r21, Y+7	; 0x07
-     f20:	c5 d1       	rcall	.+906    	; 0x12ac <__subsf3>
-     f22:	9b 01       	movw	r18, r22
-     f24:	ac 01       	movw	r20, r24
-     f26:	c8 01       	movw	r24, r16
-     f28:	b7 01       	movw	r22, r14
-     f2a:	df d3       	rcall	.+1982   	; 0x16ea <__ltsf2>
-     f2c:	87 ff       	sbrs	r24, 7
-     f2e:	0b c0       	rjmp	.+22     	; 0xf46 <HandleRelay+0xb2>
+		if (temp<(setting->temp))
+     f10:	cb 01       	movw	r24, r22
+     f12:	ba 01       	movw	r22, r20
+     f14:	28 81       	ld	r18, Y
+     f16:	39 81       	ldd	r19, Y+1	; 0x01
+     f18:	4a 81       	ldd	r20, Y+2	; 0x02
+     f1a:	5b 81       	ldd	r21, Y+3	; 0x03
+     f1c:	e6 d3       	rcall	.+1996   	; 0x16ea <__ltsf2>
+     f1e:	87 ff       	sbrs	r24, 7
+     f20:	0b c0       	rjmp	.+22     	; 0xf38 <HandleRelay+0xa4>
 		{
 			On(RELAY_PORT, relay);
-     f30:	28 b3       	in	r18, 0x18	; 24
-     f32:	81 e0       	ldi	r24, 0x01	; 1
-     f34:	90 e0       	ldi	r25, 0x00	; 0
-     f36:	0d 2c       	mov	r0, r13
-     f38:	02 c0       	rjmp	.+4      	; 0xf3e <HandleRelay+0xaa>
-     f3a:	88 0f       	add	r24, r24
-     f3c:	99 1f       	adc	r25, r25
-     f3e:	0a 94       	dec	r0
-     f40:	e2 f7       	brpl	.-8      	; 0xf3a <HandleRelay+0xa6>
-     f42:	28 2b       	or	r18, r24
-     f44:	28 bb       	out	0x18, r18	; 24
+     f22:	28 b3       	in	r18, 0x18	; 24
+     f24:	81 e0       	ldi	r24, 0x01	; 1
+     f26:	90 e0       	ldi	r25, 0x00	; 0
+     f28:	0d 2c       	mov	r0, r13
+     f2a:	02 c0       	rjmp	.+4      	; 0xf30 <HandleRelay+0x9c>
+     f2c:	88 0f       	add	r24, r24
+     f2e:	99 1f       	adc	r25, r25
+     f30:	0a 94       	dec	r0
+     f32:	e2 f7       	brpl	.-8      	; 0xf2c <HandleRelay+0x98>
+     f34:	28 2b       	or	r18, r24
+     f36:	28 bb       	out	0x18, r18	; 24
 		}
-		if (temp>(setting->temp))
-     f46:	c8 01       	movw	r24, r16
-     f48:	b7 01       	movw	r22, r14
-     f4a:	28 81       	ld	r18, Y
-     f4c:	39 81       	ldd	r19, Y+1	; 0x01
-     f4e:	4a 81       	ldd	r20, Y+2	; 0x02
-     f50:	5b 81       	ldd	r21, Y+3	; 0x03
+		if (temp>(setting->temp+setting->d))
+     f38:	68 81       	ld	r22, Y
+     f3a:	79 81       	ldd	r23, Y+1	; 0x01
+     f3c:	8a 81       	ldd	r24, Y+2	; 0x02
+     f3e:	9b 81       	ldd	r25, Y+3	; 0x03
+     f40:	2c 81       	ldd	r18, Y+4	; 0x04
+     f42:	3d 81       	ldd	r19, Y+5	; 0x05
+     f44:	4e 81       	ldd	r20, Y+6	; 0x06
+     f46:	5f 81       	ldd	r21, Y+7	; 0x07
+     f48:	8a d1       	rcall	.+788    	; 0x125e <__addsf3>
+     f4a:	9b 01       	movw	r18, r22
+     f4c:	ac 01       	movw	r20, r24
+     f4e:	c8 01       	movw	r24, r16
+     f50:	b7 01       	movw	r22, r14
      f52:	75 d3       	rcall	.+1770   	; 0x163e <__gtsf2>
      f54:	18 16       	cp	r1, r24
      f56:	5c f4       	brge	.+22     	; 0xf6e <HandleRelay+0xda>

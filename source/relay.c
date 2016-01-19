@@ -25,11 +25,11 @@ void HandleRelay(Settings * setting, float temp, uint8_t relay)
 		}
 	}else
 	{
-		if (temp<(setting->temp-setting->d))
+		if (temp<(setting->temp))
 		{
 			On(RELAY_PORT, relay);
 		}
-		if (temp>(setting->temp))
+		if (temp>(setting->temp+setting->d))
 		{
 			Off(RELAY_PORT, relay);
 		}
