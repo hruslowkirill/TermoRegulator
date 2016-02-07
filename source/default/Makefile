@@ -1,89 +1,149 @@
-###############################################################################
-# Makefile for the project regulator8
-###############################################################################
+################################################################################
+# Automatically-generated file. Do not edit!
+################################################################################
 
-## General Flags
-PROJECT = regulator8
-MCU = atmega8
-TARGET = regulator8.elf
-CC = avr-gcc
+SHELL := cmd.exe
+RM := rm -rf
 
-CPP = avr-g++
+USER_OBJS :=
 
-## Options common to compile, link and assembly rules
-COMMON = -mmcu=$(MCU)
+LIBS := 
+PROJ := 
 
-## Compile options common for all C compilation units.
-CFLAGS = $(COMMON)
-CFLAGS += -Wall -gdwarf-2 -std=gnu99 -Os -funsigned-char -funsigned-bitfields -fpack-struct -fshort-enums
-CFLAGS += -MD -MP -MT $(*F).o -MF dep/$(@F).d 
+O_SRCS := 
+C_SRCS := 
+S_SRCS := 
+S_UPPER_SRCS := 
+OBJ_SRCS := 
+ASM_SRCS := 
+PREPROCESSING_SRCS := 
+OBJS := 
+OBJS_AS_ARGS := 
+C_DEPS := 
+C_DEPS_AS_ARGS := 
+EXECUTABLES := 
+OUTPUT_FILE_PATH :=
+OUTPUT_FILE_PATH_AS_ARGS :=
+AVR_APP_PATH :=$$$AVR_APP_PATH$$$
+QUOTE := "
+ADDITIONAL_DEPENDENCIES:=
+OUTPUT_FILE_DEP:=
 
-## Assembly specific flags
-ASMFLAGS = $(COMMON)
-ASMFLAGS += $(CFLAGS)
-ASMFLAGS += -x assembler-with-cpp -Wa,-gdwarf2
-
-## Linker flags
-LDFLAGS = $(COMMON)
-LDFLAGS +=  -Wl,-Map=regulator8.map
-
-
-## Intel Hex file production flags
-HEX_FLASH_FLAGS = -R .eeprom -R .fuse -R .lock -R .signature
-
-HEX_EEPROM_FLAGS = -j .eeprom
-HEX_EEPROM_FLAGS += --set-section-flags=.eeprom="alloc,load"
-HEX_EEPROM_FLAGS += --change-section-lma .eeprom=0 --no-change-warnings
+# Every subdirectory with source files must be described here
+SUBDIRS := 
 
 
-## Objects that must be built in order to link
-OBJECTS = regulator8.o ds18b20.o lcd.o settings.o relay.o 
+# Add inputs and outputs from these tool invocations to the build variables 
+C_SRCS +=  \
+../regulator8.c \
+../ds18b20.c \
+../lcd.c \
+../settings.c \
+../relay.c
 
-## Objects explicitly added by the user
-LINKONLYOBJECTS = 
 
-## Build
-all: $(TARGET) regulator8.hex regulator8.eep regulator8.lss size
+PREPROCESSING_SRCS += 
 
-## Compile
-regulator8.o: ../regulator8.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
-ds18b20.o: ../ds18b20.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+ASM_SRCS += 
 
-lcd.o: ../lcd.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
-settings.o: ../settings.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
+OBJS +=  \
+regulator8.o \
+ds18b20.o \
+lcd.o \
+settings.o \
+relay.o
 
-relay.o: ../relay.c
-	$(CC) $(INCLUDES) $(CFLAGS) -c  $<
 
-##Link
-$(TARGET): $(OBJECTS)
-	 $(CC) $(LDFLAGS) $(OBJECTS) $(LINKONLYOBJECTS) $(LIBDIRS) $(LIBS) -o $(TARGET)
+OBJS_AS_ARGS +=  \
+regulator8.o \
+ds18b20.o \
+lcd.o \
+settings.o \
+relay.o
 
-%.hex: $(TARGET)
-	avr-objcopy -O ihex $(HEX_FLASH_FLAGS)  $< $@
 
-%.eep: $(TARGET)
-	-avr-objcopy $(HEX_EEPROM_FLAGS) -O ihex $< $@ || exit 0
+C_DEPS +=  \
+regulator8.d \
+ds18b20.d \
+lcd.d \
+settings.d \
+relay.d
 
-%.lss: $(TARGET)
-	avr-objdump -h -S $< > $@
 
-size: ${TARGET}
-	@echo
-	@avr-size -C --mcu=${MCU} ${TARGET}
+C_DEPS_AS_ARGS +=  \
+regulator8.d \
+ds18b20.d \
+lcd.d \
+settings.d \
+relay.d
 
-## Clean target
-.PHONY: clean
+
+OUTPUT_FILE_PATH +=regulator8.elf
+
+OUTPUT_FILE_PATH_AS_ARGS +=regulator8.elf
+
+ADDITIONAL_DEPENDENCIES:=
+
+OUTPUT_FILE_DEP:= ./makedep.mk
+
+# AVR32/GNU C Compiler
+
+
+
+
+
+
+
+
+
+
+
+./%.o: .././%.c
+	@echo Building file: $<
+	@echo Invoking: AVR/GNU C Compiler
+	$(QUOTE)C:\WinAVR-20100110\bin\avr-gcc.exe$(QUOTE)  -funsigned-char -funsigned-bitfields -Os -fpack-struct -fshort-enums -Wall -c -gdwarf-2 -std=gnu99  -MD -MP -MF "$(@:%.o=%.d)" -MT"$(@:%.o=%.d)"  -mmcu=atmega8  -o"$@" "$<" 
+	@echo Finished building: $<
+
+
+
+# AVR32/GNU Preprocessing Assembler
+
+
+
+# AVR32/GNU Assembler
+
+
+
+
+ifneq ($(MAKECMDGOALS),clean)
+ifneq ($(strip $(C_DEPS)),)
+-include $(C_DEPS)
+endif
+endif
+
+# Add inputs and outputs from these tool invocations to the build variables 
+
+# All Target
+all: $(OUTPUT_FILE_PATH) $(ADDITIONAL_DEPENDENCIES)
+
+$(OUTPUT_FILE_PATH): $(OBJS) $(USER_OBJS) $(OUTPUT_FILE_DEP)
+	@echo Building target: $@
+	@echo Invoking: AVR/GNU C Linker
+	$(QUOTE)C:\WinAVR-20100110\bin\avr-gcc.exe$(QUOTE) -o$(OUTPUT_FILE_PATH_AS_ARGS) $(OBJS_AS_ARGS) $(USER_OBJS) $(LIBS) -Wl,-Map="regulator8.map"  -mmcu=atmega8  
+	@echo Finished building target: $@
+	"C:\WinAVR-20100110\bin\avr-objcopy.exe" -O ihex -R .eeprom -R .fuse -R .lock -R .signature  "regulator8.elf" "regulator8.hex"
+	"C:\WinAVR-20100110\bin\avr-objcopy.exe" -j .eeprom  --set-section-flags=.eeprom=alloc,load --change-section-lma .eeprom=0  --no-change-warnings -O ihex "regulator8.elf" "regulator8.eep" || exit 0
+	"C:\WinAVR-20100110\bin\avr-objdump.exe" -h -S "regulator8.elf" > "regulator8.lss"
+	"C:\WinAVR-20100110\bin\avr-size.exe" -C --mcu=atmega8  "regulator8.elf"
+	
+
+
+
+
+# Other Targets
 clean:
-	-rm -rf $(OBJECTS) regulator8.elf dep/* regulator8.hex regulator8.eep regulator8.lss regulator8.map
-
-
-## Other dependencies
--include $(shell mkdir dep 2>NUL) $(wildcard dep/*)
-
+	-$(RM) $(OBJS_AS_ARGS)$(C_DEPS_AS_ARGS) $(EXECUTABLES) 
+	rm -rf "regulator8.hex" "regulator8.lss" "regulator8.eep" "regulator8.map"
+	

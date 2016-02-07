@@ -68,7 +68,6 @@ int main()
 	ledON;
 	LCD_Clear_Display();
 	
-
 	
 	while (1)
 	{

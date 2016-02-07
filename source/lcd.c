@@ -132,7 +132,7 @@ void LCD_Move_Cursor(byte position)
 	byte p = 128;
 	if (position>15)
 	{
-		p = p+40;
+		p = p+LCD_2ROW_OFFSET;//40
 		position = position-16;
 	}
 	p = p+position;
