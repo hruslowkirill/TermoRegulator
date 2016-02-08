@@ -8,3 +8,6 @@ To run the simulation:
 4. Set Initial Content of Data EEPROM to "\source\default\regulator8.bin" (Note: bin file was made by HEX2BIN.exe from regulator8.eep file)
 5. Run Simulation.
 6. To enter menu press OK button and wait for 10 seconds.
+
+Video with working device is available here:
+https://www.youtube.com/watch?v=qEKEROn3Aic
