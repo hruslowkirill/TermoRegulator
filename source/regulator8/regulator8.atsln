@@ -1,0 +1,20 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# AvrStudio Solution File, Format Version 11.00
+Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "regulator8", "regulator8\regulator8.cproj", "{0681A475-0E66-4C87-B8E5-04BA9CFEA872}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|AVR = Debug|AVR
+		Release|AVR = Release|AVR
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{0681A475-0E66-4C87-B8E5-04BA9CFEA872}.Debug|AVR.ActiveCfg = Debug|AVR
+		{0681A475-0E66-4C87-B8E5-04BA9CFEA872}.Debug|AVR.Build.0 = Debug|AVR
+		{0681A475-0E66-4C87-B8E5-04BA9CFEA872}.Release|AVR.ActiveCfg = Release|AVR
+		{0681A475-0E66-4C87-B8E5-04BA9CFEA872}.Release|AVR.Build.0 = Release|AVR
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
