@@ -1,4 +1,4 @@
-# TermoRegulator
+﻿# TermoRegulator
 The project contains the source code and Proteus simulation for a device that turns on/off heaters accroding to the temperature.
 
 #To run the simulation:
@@ -18,3 +18,21 @@ The project contains the source code and Proteus simulation for a device that tu
 
 #Video with working device is available here:
 https://www.youtube.com/watch?v=qEKEROn3Aic
+
+Инструкция по эксплуатации:
+
+1. В рабочем режиме:
+	Длинное нажатие кнопки "ОК" - вход в меню выбора реле.
+	Длинное нажание кнопки "+" - вход в меню сброса настроек.
+2. В режиме настроек:
+	Длинное нажатие кнопки "ОК" - выход в рабочий режим.
+	Длинное нажание кнопки "-" - выход на предыдущий уровень меню.
+	
+Список настроек (слева направо сверху вниз):
+	Температура
+	Гестерезис
+	Направление (Up Down)
+	Вкл/Выкл
+	Период
+	Количество частей периода, при которых реле включен
+	Шаг

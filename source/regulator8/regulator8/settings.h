@@ -5,10 +5,11 @@
 #include <avr/eeprom.h>
 #define DEFAULT_TEMP 20.5
 #define DEFAULT_D 1.0
-#define DEFAULT_DIRECTION 0
+#define DEFAULT_DIRECTION 1
 #define DEFAULT_ON 0
 #define DEFAULT_PERIOD 1
 #define DEFAULT_PART 30
+#define DEFAULT_PART_D 0
 
 typedef struct
 {
@@ -18,6 +19,7 @@ typedef struct
 	uint8_t on;	
 	uint8_t period;
 	uint8_t part;
+	uint8_t partD;
 }Settings;
 
 typedef Settings SettingsType[4][3];

@@ -2,6 +2,8 @@
 
 uint8_t isRelayOn[4][3] = {0};
 Settings * pwmSetting = NULL;
+int8_t pwmParts = 0;
+uint8_t pwmPartsD = 0;
 
 void Relay_Init()
 {
@@ -26,8 +28,15 @@ void Relay_Init()
     TIMSK1 = (1 << TOIE1);
     // Set CS10 bit so timer runs at clock speed:
     TCCR1B |= (1 << CS10)|(1 << CS11);
+	//TCCR1B |= (1 << CS10);
     // enable global interrupts:
     sei();
+}
+
+void resetPWMParts(Settings * setting)
+{
+		pwmParts = setting->part;
+		pwmPartsD = setting->partD;
 }
 
 int counter = 0;
@@ -35,11 +44,15 @@ int counter = 0;
 ISR(TIMER1_OVF_vect)
 {
 	if (pwmSetting==NULL)
+	{
+		Off(RELAY_PORT, PWN_RELAY);
 		return;
+	}		
+	
 	counter++;
-	if (counter==(N_PARTS*pwmSetting->period))
+	if (counter>(N_PARTS*pwmSetting->period))
 		counter = 1;
-	if (counter<=pwmSetting->period*pwmSetting->part)
+	if (counter<=pwmSetting->period*pwmParts/*pwmSetting->part*/)
 		On(RELAY_PORT, PWN_RELAY);
 	else
 		Off(RELAY_PORT, PWN_RELAY);
@@ -66,7 +79,7 @@ void HandleRelay(SettingsType all_settings, float * temp, uint8_t relay)
 			}
 			if (temp[i]>(setting->temp))
 			{
-				isRelayOn[relay][i] = 0;
+				isRelayOn[relay][i] = 1;
 			}
 		}else
 		{
@@ -89,20 +102,28 @@ void HandleRelay(SettingsType all_settings, float * temp, uint8_t relay)
 			Off(RELAY_PORT, relay);	
 	}else
 	{
+		uint8_t isOn = pwmSetting!=NULL;
 		if ((!all_settings[relay][0].on)&&(!all_settings[relay][1].on)&&(!all_settings[relay][2].on))
 		{
-			pwmSetting = NULL;			
+			pwmSetting = NULL;	
+			pwmParts = 0;		
 		}else
 		{
-			for (i=0; i<3; i++)
+
+			setting = &all_settings[relay][0];
+			if ((setting->on)&&(isRelayOn[relay][0]))
 			{
-				setting = &all_settings[relay][i];
-				if ((setting->on)&&(isRelayOn[relay][i]))
+
+				pwmSetting = setting;
+				if (!isOn)
 				{
-					pwmSetting = setting;
-					break;				
-				}
+					pwmParts = pwmParts-pwmPartsD;					
+				}							
+			}else
+			{
+				pwmSetting = NULL;				
 			}	
+			
 		}				
 	}			
 }

@@ -2,8 +2,8 @@
 #include "defines.h"
 #include "lcd.h"
 #include "ds18b20.h"
-#include "settings.h"
 #include "relay.h"
+#include "settings.h"
 
 #define BTNDDR DDRC
 #define BTNPORT PORTC
@@ -31,6 +31,8 @@
 #define CONTROL_LIMITS(VALUE, LOW, HIGH) if (VALUE<LOW) VALUE=HIGH; if (VALUE>HIGH) VALUE=LOW;
 
 SettingsType all_settings;
+
+extern int8_t pwmParts;
 
 
 int32_t BTN1_status;
@@ -71,8 +73,15 @@ float temp[3];
 uint8_t NUMBER_OF_SETTINGS(uint8_t RELAY)
 {
 	if (RELAY==PWN_RELAY)
-		return 6;
+		return 7;
 	return 4;		
+}
+
+uint8_t NUMBER_OF_TERMS(uint8_t RELAY)
+{
+	if (RELAY==PWN_RELAY)
+		return 1;
+	return 3;		
 }
 
 int main()
@@ -85,7 +94,17 @@ int main()
 	Relay_Init();
 
 	ledON;
-	LCD_Clear_Display();
+	/*LCD_Clear_Display();
+	LCD_2buffer_begin();
+	LCD_2buffer_printStr("HELLO");
+	LCD_2buffer_end();
+	while (1)
+	{
+		ledOFF;
+		_delay_ms(1000);
+		ledON;
+		_delay_ms(1000);		
+	}*/
 	
 	while (1)
 	{
@@ -212,6 +231,9 @@ void DoWork()
 		LCD_2buffer_Show_FloatTemperature1(temp[2]);
 		
 		LCD_2buffer_Move_Cursor(24);
+		LCD_2buffer_Print_Number(pwmParts);
+		
+		/*LCD_2buffer_Move_Cursor(24);
 		uint8_t i;
 		for (i=0; i<3; i++)
 		{
@@ -219,7 +241,7 @@ void DoWork()
 				LCD_2buffer_printStr("1");
 			else
 				LCD_2buffer_printStr("0");			
-		}
+		}*/
 		
 		LCD_2buffer_end();
 		iterations = 1;
@@ -277,12 +299,14 @@ void ShowTerm()
 	LCD_2buffer_Move_Cursor(1);
 	LCD_2buffer_printStr("Temp1");
 
-	LCD_2buffer_Move_Cursor(9);
-	LCD_2buffer_printStr("Temp2");
+	if (current_relay!=PWN_RELAY)
+	{
+		LCD_2buffer_Move_Cursor(9);
+		LCD_2buffer_printStr("Temp2");
 
-	LCD_2buffer_Move_Cursor(17);
-	LCD_2buffer_printStr("Temp3");
-
+		LCD_2buffer_Move_Cursor(17);
+		LCD_2buffer_printStr("Temp3");
+	}
 	switch(	sub_current_status)
 	{
 		case 0:
@@ -394,6 +418,11 @@ void ShowSettings()
 			LCD_2buffer_printStr("/");
 			LCD_2buffer_Print_Number(N_PARTS);
 		}	
+		if ((blinker)||(settings_item2!=7))
+		{
+			LCD_2buffer_Move_Cursor(17);
+			LCD_2buffer_Print_Number(settings->partD);
+		}	
 	}	
 	switch(	settings_item1)
 	{
@@ -419,6 +448,9 @@ void ShowSettings()
 		
 		case 5:
 			LCD_2buffer_Move_Cursor(8);
+		break;
+		case 6:
+			LCD_2buffer_Move_Cursor(16);
 		break;
 		}
 		LCD_2buffer_printStr(">");	
@@ -491,7 +523,7 @@ void BTN1_Pressed()
 		break;
 		case STATUS_TERM:
 			if(sub_current_status==0)
-				sub_current_status = 3;
+				sub_current_status = NUMBER_OF_TERMS(current_relay);
 			sub_current_status--;
 		break;
 		case STATUS_SETTINGS:
@@ -527,6 +559,11 @@ void BTN1_Pressed()
 				settings->part --;
 				CONTROL_LIMITS(settings->part, 1, N_PARTS)
 			}
+			if (settings_item2==7)
+			{
+				settings->partD --;
+				CONTROL_LIMITS(settings->partD, 0, 50)
+			}
 		break;
 	}
 	iterations = 0;
@@ -542,7 +579,7 @@ void BTN2_Pressed()
 		break;
 		case STATUS_TERM:
 			sub_current_status++;
-			if(sub_current_status==3)
+			if(sub_current_status==NUMBER_OF_TERMS(current_relay))
 				sub_current_status = 0;
 		break;
 		case STATUS_SETTINGS:
@@ -577,6 +614,11 @@ void BTN2_Pressed()
 			{
 				settings->part ++;
 				CONTROL_LIMITS(settings->part, 1, N_PARTS)
+			}
+			if (settings_item2==7)
+			{
+				settings->partD ++;
+				CONTROL_LIMITS(settings->partD, 0, 50)
 			}
 		break;
 	}
