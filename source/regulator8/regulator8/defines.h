@@ -22,6 +22,8 @@
 
 #define PWN_RELAY RELAY1
 
+#define PWN_SIGNAL 5
+
 
 #define Off(PORT, N) PORT &= ~(1<<N)
 #define On(PORT, N) PORT |= 1<<N

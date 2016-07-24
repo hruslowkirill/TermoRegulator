@@ -5,6 +5,8 @@
 
 //#define LCD_2ROW_OFFSET 40 //real device
 
+
+
 #define LCD_2ROW_OFFSET 64 //simulation
 
 

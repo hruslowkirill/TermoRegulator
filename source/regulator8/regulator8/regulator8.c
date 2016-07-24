@@ -31,6 +31,7 @@
 #define CONTROL_LIMITS(VALUE, LOW, HIGH) if (VALUE<LOW) VALUE=HIGH; if (VALUE>HIGH) VALUE=LOW;
 
 SettingsType all_settings;
+//PWMSettingsType all_pwm_settings;
 
 extern int8_t pwmParts;
 
@@ -80,18 +81,27 @@ uint8_t NUMBER_OF_SETTINGS(uint8_t RELAY)
 uint8_t NUMBER_OF_TERMS(uint8_t RELAY)
 {
 	if (RELAY==PWN_RELAY)
-		return 1;
+		return 2;
 	return 3;		
+}
+
+uint8_t previousPWMSignal;
+
+void onPWMSignalChange()
+{
+	resetPWMParts(all_settings);
 }
 
 int main()
 {
 	
 	int turn = 0;
+	previousPWMSignal = readPWMSignal();
 	LCD_Init();
 	BTN_Init();
 	Settings_Init(all_settings);
 	Relay_Init();
+	resetPWMParts(all_settings);
 
 	ledON;
 	/*LCD_Clear_Display();
@@ -108,6 +118,14 @@ int main()
 	
 	while (1)
 	{
+		uint8_t q = readPWMSignal();
+		if (q!=previousPWMSignal)
+		{
+			onPWMSignalChange();			
+		}
+		previousPWMSignal = q;
+		
+		
 		BTN_Process();
 		_delay_ms(1);
 		//LCD_Clear_Display();
@@ -153,6 +171,11 @@ void switchToRelay(uint8_t r)
 	current_status=STATUS_RELAY;
 	sub_current_status = r;
 	iterations = 0;
+	
+	RELAY_OFF(RELAY1);
+	RELAY_OFF(RELAY2);
+	RELAY_OFF(RELAY3);
+	RELAY_OFF(RELAY4);
 }	
 
 void switchToTerm(uint8_t r, uint8_t t)
@@ -181,6 +204,11 @@ void switchToReset()
 	iterations = 0;
 	settings_item1 = 0;
 	settings_item2 = 0;
+	
+	RELAY_OFF(RELAY1);
+	RELAY_OFF(RELAY2);
+	RELAY_OFF(RELAY3);
+	RELAY_OFF(RELAY4);
 }
 
 void DoWork()
@@ -232,6 +260,15 @@ void DoWork()
 		
 		LCD_2buffer_Move_Cursor(24);
 		LCD_2buffer_Print_Number(pwmParts);
+		
+		LCD_2buffer_Move_Cursor(31);
+		char pwmSignalChar[2];
+		pwmSignalChar[1] = '\0';
+		if (readPWMSignal())
+			pwmSignalChar[0] = '+';
+		else
+			pwmSignalChar[0] = '-';
+		LCD_2buffer_printStr(pwmSignalChar);
 		
 		/*LCD_2buffer_Move_Cursor(24);
 		uint8_t i;
@@ -299,11 +336,11 @@ void ShowTerm()
 	LCD_2buffer_Move_Cursor(1);
 	LCD_2buffer_printStr("Temp1");
 
+	LCD_2buffer_Move_Cursor(9);
+	LCD_2buffer_printStr("Temp2");
+	
 	if (current_relay!=PWN_RELAY)
 	{
-		LCD_2buffer_Move_Cursor(9);
-		LCD_2buffer_printStr("Temp2");
-
 		LCD_2buffer_Move_Cursor(17);
 		LCD_2buffer_printStr("Temp3");
 	}
@@ -356,6 +393,7 @@ void ShowSettings()
 		}
 
 
+	
 	settings = &all_settings[current_relay][current_term];	
 	/*switch(sub_current_status)
 	{
@@ -386,10 +424,10 @@ void ShowSettings()
 			LCD_2buffer_Move_Cursor(17);
 			if(settings->direction)
 			{
-				LCD_2buffer_printStr("UP");
+				LCD_2buffer_printStr("COLD");
 			}else
 			{
-				LCD_2buffer_printStr("DOWN");
+				LCD_2buffer_printStr("HEAT");
 			}
 		}
 		if ((blinker)||(settings_item2!=4))
@@ -403,27 +441,29 @@ void ShowSettings()
 				LCD_2buffer_printStr("Off");
 			}
 		}
-	}else
+	}else if (settings_item1<=6)
 	{
 		if ((blinker)||(settings_item2!=5))
 		{
 			LCD_2buffer_Move_Cursor(1);
-			LCD_2buffer_Print_Number(settings->period);
+			LCD_2buffer_Print_Number(settings->pwmSettings.period);
 		}
 	
 		if ((blinker)||(settings_item2!=6))
 		{
 			LCD_2buffer_Move_Cursor(9);
-			LCD_2buffer_Print_Number(settings->part);
+			LCD_2buffer_Print_Number(settings->pwmSettings.part);
 			LCD_2buffer_printStr("/");
 			LCD_2buffer_Print_Number(N_PARTS);
 		}	
 		if ((blinker)||(settings_item2!=7))
 		{
 			LCD_2buffer_Move_Cursor(17);
-			LCD_2buffer_Print_Number(settings->partD);
+			LCD_2buffer_Print_Number(settings->pwmSettings.partD);
 		}	
-	}	
+		LCD_2buffer_Move_Cursor(25);
+		LCD_2buffer_printStr("Set1");
+	}
 	switch(	settings_item1)
 	{
 		case 0:
@@ -450,6 +490,15 @@ void ShowSettings()
 			LCD_2buffer_Move_Cursor(8);
 		break;
 		case 6:
+			LCD_2buffer_Move_Cursor(16);
+		break;
+		case 7:
+			LCD_2buffer_Move_Cursor(0);
+		break;
+		case 8:
+			LCD_2buffer_Move_Cursor(8);
+		break;
+		case 9:
 			LCD_2buffer_Move_Cursor(16);
 		break;
 		}
@@ -551,18 +600,18 @@ void BTN1_Pressed()
 			}
 			if (settings_item2==5)
 			{
-				settings->period --;
-				CONTROL_LIMITS(settings->period, 1, 30)
+				settings->pwmSettings.period --;
+				CONTROL_LIMITS(settings->pwmSettings.period, 1, 30)
 			}
 			if (settings_item2==6)
 			{
-				settings->part --;
-				CONTROL_LIMITS(settings->part, 1, N_PARTS)
+				settings->pwmSettings.part --;
+				CONTROL_LIMITS(settings->pwmSettings.part, 1, N_PARTS)
 			}
 			if (settings_item2==7)
 			{
-				settings->partD --;
-				CONTROL_LIMITS(settings->partD, 0, 50)
+				settings->pwmSettings.partD --;
+				CONTROL_LIMITS(settings->pwmSettings.partD, 0, 50)
 			}
 		break;
 	}
@@ -607,19 +656,20 @@ void BTN2_Pressed()
 			}
 			if (settings_item2==5)
 			{
-				settings->period ++;
-				CONTROL_LIMITS(settings->period, 1, 30)
+				settings->pwmSettings.period ++;
+				CONTROL_LIMITS(settings->pwmSettings.period, 1, 30)
 			}
 			if (settings_item2==6)
 			{
-				settings->part ++;
-				CONTROL_LIMITS(settings->part, 1, N_PARTS)
+				settings->pwmSettings.part ++;
+				CONTROL_LIMITS(settings->pwmSettings.part, 1, N_PARTS)
 			}
 			if (settings_item2==7)
 			{
-				settings->partD ++;
-				CONTROL_LIMITS(settings->partD, 0, 50)
+				settings->pwmSettings.partD ++;
+				CONTROL_LIMITS(settings->pwmSettings.partD, 0, 50)
 			}
+			
 		break;
 	}
 	iterations = 0;
@@ -649,6 +699,7 @@ void BTN3_Pressed()
 			{	
 				settings_item2 = 0;
 				Settings_Write(all_settings, current_relay, current_term);
+				//PWMSettingsWrite(all_pwm_settings);
 			}
 		break;
 	}

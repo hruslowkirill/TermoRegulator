@@ -8,19 +8,23 @@ extern Settings setting1;
 extern Settings setting2;
 extern Settings setting3;*/
 
+/*PWMSettings EEMEM EEMPWMSettings[2] = {
+	{DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}
+};*/
+
 
 Settings EEMEM EEMEMsettings[4][3] = {
 	{
-			{DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}	
+			{DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}	
 	},
 	{
-			{DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}
+			{DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}
 	},		
 	{
-			{DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}
+			{DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}
 	},
 	{
-			{DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}
+			{DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}, {DEFAULT_TEMP, DEFAULT_D, DEFAULT_DIRECTION, DEFAULT_ON, {DEFAULT_PERIOD, DEFAULT_PART, DEFAULT_PART_D}}
 	}
 };
 
@@ -53,7 +57,8 @@ void Settings_Read(SettingsType all_settings, uint8_t relay, uint8_t term)
 		eeprom_read_block (( void *) &all_settings[relay][term] , ( const void *) &EEMEMsettings[relay][term] , sizeof(Settings)) ;
 		if (relay==PWN_RELAY)
 		{
-			resetPWMParts(&all_settings[relay][0]);			
+			//resetPWMParts(&all_settings[relay][0]);
+			resetPWMParts(all_settings);			
 		}
 }
 
@@ -62,7 +67,8 @@ void Settings_Write(SettingsType all_settings, uint8_t relay, uint8_t term)
 	eeprom_update_block (( void *) &all_settings[relay][term] , ( const void *) &EEMEMsettings[relay][term] , sizeof(Settings)) ;
 	if (relay==PWN_RELAY)
 	{
-		resetPWMParts(&all_settings[relay][0]);			
+		//resetPWMParts(&all_settings[relay][0]);	
+		resetPWMParts(all_settings);		
 	}
 }
 
@@ -76,11 +82,23 @@ void Settings_Reset(SettingsType all_settings)
 			all_settings[i][j].d = DEFAULT_D;
 			all_settings[i][j].direction = DEFAULT_DIRECTION;
 			all_settings[i][j].on = DEFAULT_ON;
-			all_settings[i][j].period = DEFAULT_PERIOD;
-			all_settings[i][j].part = DEFAULT_PART;
+			//all_settings[i][j].period = DEFAULT_PERIOD;
+			//all_settings[i][j].part = DEFAULT_PART;
 			Settings_Write(all_settings, i, j);
 		}				
 }
+
+/*void PWMSettingsRead(PWMSettingsType all_pwm_settings)
+{
+	eeprom_read_block (( void *) &all_pwm_settings[0] , ( const void *) &EEMPWMSettings[0] , sizeof(PWMSettings));
+	eeprom_read_block (( void *) &all_pwm_settings[1] , ( const void *) &EEMPWMSettings[1] , sizeof(PWMSettings));
+}
+
+void PWMSettingsWrite(PWMSettingsType all_pwm_settings)
+{
+	eeprom_update_block (( void *) &all_pwm_settings[0]  , ( const void *) &EEMPWMSettings[0] , sizeof(PWMSettings)) ;
+	eeprom_update_block (( void *) &all_pwm_settings[1]  , ( const void *) &EEMPWMSettings[1] , sizeof(PWMSettings)) ;
+}*/
 
 /*void Settings_Read(uint8_t relay, uint8_t term)
 {
