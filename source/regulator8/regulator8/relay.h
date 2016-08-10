@@ -13,6 +13,9 @@
 
 void Relay_Init();
 void HandleRelay(SettingsType all_settings, float * temp, uint8_t relay);
+void HandleRelayNormal(SettingsType all_settings, float * temp, uint8_t relay);
+
+void HandleRelayPWM(SettingsType all_settings, float * temp, uint8_t relay);
 void resetPWMParts(SettingsType all_settings);
 
 uint8_t readPWMSignal();

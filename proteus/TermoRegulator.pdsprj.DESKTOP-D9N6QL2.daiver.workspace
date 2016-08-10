@@ -1,12 +1,8 @@
 <?xml version='1.0' encoding='UTF-8' standalone='yes'?>
 <WORKSPACE>
- <FRAME activewindow="1">
-  <PLACEMENT>2c0000000000000001000000ffffffffffffffffffffffffffffffff100000000c000000bf030000fb030000</PLACEMENT>
+ <FRAME activewindow="0">
+  <PLACEMENT>2c0000000000000001000000ffffffffffffffffffffffffffffffffb20000000c000000cf060000fb030000</PLACEMENT>
   <WINDOW type="default" module="ISIS"/>
-  <WINDOW type="default" module="VSMDEBUG"/>
- </FRAME>
- <FRAME activewindow="-1">
-  <PLACEMENT>2c0000000000000001000000ffffffffffffffffffffffffffffffff94010000280000004305000017040000</PLACEMENT>
  </FRAME>
  <MODULE name="VSMDEBUG">
   <PWI>

@@ -82,6 +82,9 @@ void Settings_Reset(SettingsType all_settings)
 			all_settings[i][j].d = DEFAULT_D;
 			all_settings[i][j].direction = DEFAULT_DIRECTION;
 			all_settings[i][j].on = DEFAULT_ON;
+			all_settings[i][j].pwmSettings.part = DEFAULT_PART;
+			all_settings[i][j].pwmSettings.period = DEFAULT_PERIOD;
+			all_settings[i][j].pwmSettings.partD = DEFAULT_PART_D;
 			//all_settings[i][j].period = DEFAULT_PERIOD;
 			//all_settings[i][j].part = DEFAULT_PART;
 			Settings_Write(all_settings, i, j);

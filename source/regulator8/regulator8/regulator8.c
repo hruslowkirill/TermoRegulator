@@ -462,7 +462,7 @@ void ShowSettings()
 			LCD_2buffer_Print_Number(settings->pwmSettings.partD);
 		}	
 		LCD_2buffer_Move_Cursor(25);
-		LCD_2buffer_printStr("Set1");
+		//LCD_2buffer_printStr("Set1");
 	}
 	switch(	settings_item1)
 	{
