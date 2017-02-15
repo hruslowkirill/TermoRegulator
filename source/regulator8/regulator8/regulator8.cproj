@@ -69,6 +69,12 @@
     <Compile Include="lcd.h">
       <SubType>compile</SubType>
     </Compile>
+    <Compile Include="Menu.c">
+      <SubType>compile</SubType>
+    </Compile>
+    <Compile Include="Menu.h">
+      <SubType>compile</SubType>
+    </Compile>
     <Compile Include="regulator8.c">
       <SubType>compile</SubType>
     </Compile>

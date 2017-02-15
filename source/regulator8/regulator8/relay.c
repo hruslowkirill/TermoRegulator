@@ -53,7 +53,7 @@ void Relay_Init()
 	
 }
 
-void resetPWMParts(SettingsType all_settings)
+/*void resetPWMParts(SettingsType all_settings)
 {
 		//pwmParts = setting->part;
 		//pwmPartsD = setting->partD;
@@ -63,7 +63,7 @@ void resetPWMParts(SettingsType all_settings)
 		//pwmParts = all_pwm_setting[q].part;
 		//pwmPartsD = all_pwm_setting[q].partD;
 		firstTime = 1;
-}
+}*/
 
 int counter = 0;
 
@@ -71,7 +71,7 @@ int counter = 0;
 ISR(TIMER1_COMPA_vect)
 {
 	
-	if (pwmSetting==NULL)
+	/*if (pwmSetting==NULL)
 	{
 		RELAY_OFF( PWN_RELAY);
 		return;
@@ -80,20 +80,20 @@ ISR(TIMER1_COMPA_vect)
 	counter++;
 	if (counter>(N_PARTS*pwmSetting->period))
 		counter = 1;
-	if (counter<=pwmSetting->period*pwmParts/*pwmSetting->part*/)
+	if (counter<=pwmSetting->period*pwmParts)
 		RELAY_ON( PWN_RELAY);
 	else
-		RELAY_OFF( PWN_RELAY);
+		RELAY_OFF( PWN_RELAY);*/
 }
 
-void HandleRelay(SettingsType all_settings, float * temp, uint8_t relay)
+/*void HandleRelay(SettingsType all_settings, float * temp, uint8_t relay)
 {
-	if (relay!=PWN_RELAY)
+	if (relay!=PWM_RELAY)
 	{
 		HandleRelayNormal(all_settings, temp, relay);
 	}else
 	{
-		HandleRelayPWM(all_settings, temp, relay);
+		//HandleRelayPWM(all_settings, temp, relay);
 	}			
 }
 
@@ -147,9 +147,9 @@ void HandleRelayNormal(SettingsType all_settings, float * temp, uint8_t relay)
 		RELAY_ON( relay);
 	else
 		RELAY_OFF( relay);
-}
+}*/
 
-void HandleRelayPWM(SettingsType all_settings, float * temp, uint8_t relay)
+/*void HandleRelayPWM(SettingsType all_settings, float * temp, uint8_t relay)
 {
 	Settings * setting;
 	uint8_t q = readPWMSignal();
@@ -200,7 +200,7 @@ void HandleRelayPWM(SettingsType all_settings, float * temp, uint8_t relay)
 			}	
 			
 		}		
-}
+}*/
 
 
 uint8_t readPWMSignal()

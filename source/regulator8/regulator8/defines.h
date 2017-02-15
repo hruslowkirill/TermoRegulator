@@ -20,7 +20,7 @@
 #define RELAY3 2
 #define RELAY4 3
 
-#define PWN_RELAY RELAY1
+#define PWM_RELAY RELAY4
 
 #define PWN_SIGNAL 5
 

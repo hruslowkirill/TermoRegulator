@@ -6,6 +6,8 @@ ds18b20.c
 
 lcd.c
 
+Menu.c
+
 regulator8.c
 
 relay.c

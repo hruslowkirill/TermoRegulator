@@ -37,6 +37,7 @@ SUBDIRS :=
 C_SRCS +=  \
 ../ds18b20.c \
 ../lcd.c \
+../Menu.c \
 ../regulator8.c \
 ../relay.c \
 ../settings.c
@@ -51,6 +52,7 @@ ASM_SRCS +=
 OBJS +=  \
 ds18b20.o \
 lcd.o \
+Menu.o \
 regulator8.o \
 relay.o \
 settings.o
@@ -59,6 +61,7 @@ settings.o
 OBJS_AS_ARGS +=  \
 ds18b20.o \
 lcd.o \
+Menu.o \
 regulator8.o \
 relay.o \
 settings.o
@@ -67,6 +70,7 @@ settings.o
 C_DEPS +=  \
 ds18b20.d \
 lcd.d \
+Menu.d \
 regulator8.d \
 relay.d \
 settings.d
@@ -75,6 +79,7 @@ settings.d
 C_DEPS_AS_ARGS +=  \
 ds18b20.d \
 lcd.d \
+Menu.d \
 regulator8.d \
 relay.d \
 settings.d
@@ -89,6 +94,8 @@ ADDITIONAL_DEPENDENCIES:=
 OUTPUT_FILE_DEP:= ./makedep.mk
 
 # AVR32/GNU C Compiler
+
+
 
 
 
