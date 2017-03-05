@@ -33,7 +33,7 @@
 AllSettings allSettings;
 //PWMSettingsType all_pwm_settings;
 
-extern int8_t pwmParts;
+//extern int8_t pwmParts;
 
 
 int32_t BTN1_status;
@@ -60,6 +60,10 @@ typedef enum {PS_WORK, PS_MENU} ProgramState;
 ProgramState ps;
 Menu menu;
 
+RelayNormal relayNormal1;
+RelayNormal relayNormal2;
+RelayNormal relayNormal3;
+
 uint32_t iterations = 0;
 
 
@@ -82,6 +86,10 @@ int main()
 	BTN_Init();
 	Settings_Init(&allSettings);
 	Relay_Init();
+	
+	Relay_Normal_Init(&relayNormal1, RELAY1);
+	Relay_Normal_Init(&relayNormal2, RELAY2);
+	Relay_Normal_Init(&relayNormal3, RELAY3);
 	
 	Menu_Init(&menu, &allSettings);
 	
@@ -184,6 +192,9 @@ void DoWork()
 		temp[2] = DS_getFloatTemperature(DSBIT3);
 
 		
+		Relay_Normal_Process(&relayNormal1, &allSettings, temp);
+		Relay_Normal_Process(&relayNormal2, &allSettings, temp);
+		Relay_Normal_Process(&relayNormal3, &allSettings, temp);
 		/*HandleRelay(all_settings, temp, RELAY1);
 		HandleRelay(all_settings, temp, RELAY2);
 		HandleRelay(all_settings, temp, RELAY3);
@@ -202,7 +213,7 @@ void DoWork()
 		LCD_2buffer_Show_FloatTemperature1(temp[2]);
 		
 		LCD_2buffer_Move_Cursor(24);
-		LCD_2buffer_Print_Number(pwmParts);
+		LCD_2buffer_Print_Number(/*pwmParts*/0);
 		
 		LCD_2buffer_Move_Cursor(31);
 		char pwmSignalChar[2];

@@ -1,10 +1,10 @@
 #include "relay.h"
 
-uint8_t isRelayOn[4][3] = {1};
+/*uint8_t isRelayOn[4][3] = {1};
 PWMSettings * pwmSetting = NULL;
 int8_t pwmParts = 0;
 uint8_t pwmPartsD = 0;
-uint8_t firstTime = 1;
+uint8_t firstTime = 1;*/
 
 void Relay_Init()
 {
@@ -51,6 +51,67 @@ void Relay_Init()
 	TCCR0B |= (1 << CS00)|(1 << CS02);*/
     sei();
 	
+}
+
+void Relay_Normal_Init(RelayNormal * relay, uint8_t N)
+{
+	relay->N = N;
+	relay->isRelayOn[0] = 0;
+	relay->isRelayOn[1] = 0;
+	relay->isRelayOn[2] = 0;
+	
+	On(RELAY_DDR, relay->N);
+	Off(RELAY_PORT, relay->N);
+}
+void Relay_Normal_Process(RelayNormal * relay, AllSettings * allSettings, float * temp)
+{
+	Settings * setting;
+	uint8_t i;
+	for (i=0; i<3; i++)
+	{
+		setting = &allSettings->settings[relay->N][i];
+		if (!setting->on)
+		{
+			relay->isRelayOn[i] = 0;
+			continue;				
+		}
+		if (setting->direction)//UP
+		{
+			if (temp[i]<(setting->temp))
+			{
+				//RELAY_OFF( relay);
+				relay->isRelayOn[i] = 0;
+			}
+			if (temp[i]>(setting->temp+setting->d))
+			{
+				relay->isRelayOn[i] = 1;
+			}
+		}else
+		{
+			if (temp[i]<(setting->temp-setting->d))
+			{
+				relay->isRelayOn[i] = 1;
+			}
+			if (temp[i]>(setting->temp))
+			{
+				relay->isRelayOn[i] = 0;
+			}
+		}
+	}
+	uint8_t s = allSettings->settings[relay->N][0].on|allSettings->settings[relay->N][1].on|allSettings->settings[relay->N][2].on;//0 if all are turned off
+	for (int i=0; i<3; i++)
+	{
+		if (!allSettings->settings[relay->N][i].on)
+		{
+			continue;
+		}		
+		if (!relay->isRelayOn[i])
+			s = 0;
+	}
+	if (s)
+		RELAY_ON( relay->N );
+	else
+		RELAY_OFF( relay->N );	
 }
 
 /*void resetPWMParts(SettingsType all_settings)
