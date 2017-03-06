@@ -6,7 +6,7 @@ int8_t pwmParts = 0;
 uint8_t pwmPartsD = 0;
 uint8_t firstTime = 1;*/
 
-void Relay_Init()
+/*void Relay_Init()
 {
 	Off(RELAY_DDR, PWN_SIGNAL);
 	On(RELAY_DDR, RELAY1);
@@ -26,13 +26,7 @@ void Relay_Init()
     TCCR1A = 0;        // set entire TCCR1A register to 0
     TCCR1B = 0;
  
-    /*// enable Timer1 overflow interrupt:
-    TIMSK1 = (1 << TOIE1);
-    // Set CS10 bit so timer runs at clock speed:
-    TCCR1B |= (1 << CS10)|(1 << CS11);
-	//TCCR1B |= (1 << CS12);
-    // enable global interrupts:*/
-	//OCR1A = 0x0876;
+    
 	OCR1A = 0x021D;
 
     TCCR1B |= (1 << WGM12);
@@ -44,14 +38,14 @@ void Relay_Init()
     TCCR1B |= (1 << CS12) | (1 << CS10);
 	
 	
-	/*TCCR0A=0b00000000;
-	TIMSK0 |= (1<<TOIE0);
-	TCNT0=0;
+	//TCCR0A=0b00000000;
+	//TIMSK0 |= (1<<TOIE0);
+	//TCNT0=0;
 	//TCCR0B |= (1 << CS00)|(1 << CS01);
-	TCCR0B |= (1 << CS00)|(1 << CS02);*/
+	//TCCR0B |= (1 << CS00)|(1 << CS02);
     sei();
 	
-}
+}*/
 
 void Relay_Normal_Init(RelayNormal * relay, uint8_t N)
 {
@@ -61,7 +55,7 @@ void Relay_Normal_Init(RelayNormal * relay, uint8_t N)
 	relay->isRelayOn[2] = 0;
 	
 	On(RELAY_DDR, relay->N);
-	Off(RELAY_PORT, relay->N);
+	RELAY_OFF(relay->N);
 }
 void Relay_Normal_Process(RelayNormal * relay, AllSettings * allSettings, float * temp)
 {
@@ -114,6 +108,98 @@ void Relay_Normal_Process(RelayNormal * relay, AllSettings * allSettings, float 
 		RELAY_OFF( relay->N );	
 }
 
+
+void Relay_PWM_Init(RelayPWM * relay, AllSettings * allSettings, uint8_t N)
+{
+	relay->N = N;
+	relay->allSettings = allSettings;
+	Relay_PWM_Find_Active_Settings(relay);
+	
+	relay->isRelayOn[0] = 0;
+	relay->isRelayOn[1] = 0;
+	relay->isRelayOn[2] = 0;
+	
+	relay->duty = 0;
+	relay->state = STATE0;
+	
+	Relay_PWM_Reset_Counter_Cycle(relay);
+	Relay_PWM_Reset_Counter_M(relay);
+	
+	On(RELAY_DDR, relay->N);
+	RELAY_OFF(relay->N);
+}
+void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t PWMSignal)
+{
+	/*Relay_PWM_Set_Duty_Cicle(relay, 25);
+	return;*/
+	switch (relay->state)
+	{
+		case STATE0:
+			
+		break;		
+	}
+}
+
+void Relay_PWM_Interrupt(RelayPWM * relay)
+{
+	PWMSettings * pwmSetting = Relay_PWM_GetCurrentPWMSettings(relay);
+	if (pwmSetting==NULL)
+		return;
+		
+		
+	relay->counter_cycle2++;
+	if (relay->counter_cycle2==N_PARTS*60)
+	{
+		relay->counter_minute++;
+		relay->counter_cycle2 = 0;
+	}
+		
+	relay->counter_cycle++;
+	if (relay->counter_cycle>(N_PARTS*pwmSetting->tpwm))
+		relay->counter_cycle = 1;
+	if (relay->counter_cycle<=relay->duty*pwmSetting->tpwm)
+		RELAY_ON( relay->N);
+	else
+		RELAY_OFF( relay->N );
+	
+}
+
+void Relay_PWM_Reset_Counter_Cycle(RelayPWM * relay)
+{
+	relay->counter_cycle = 0;
+}
+void Relay_PWM_Reset_Counter_M(RelayPWM * relay)
+{
+	relay->counter_cycle2 = 0;
+	relay->counter_minute = 0;
+}
+
+PWMSettings * Relay_PWM_GetCurrentPWMSettings(RelayPWM * relay)
+{
+	if (relay->activeSettings==0xFF)
+		return NULL;
+	return &relay->allSettings->PWMSettings[relay->activeSettings];	
+}
+
+void Relay_PWM_Find_Active_Settings(RelayPWM * relay)
+{
+	relay->activeSettings = 0xFF;
+	uint8_t i;
+	for (i=0; i<3; i++)
+	{
+		if (relay->allSettings->PWMSettings[i].on)
+		{
+			relay->activeSettings = i;
+			return;		
+		}		
+	}
+}
+
+void Relay_PWM_Set_Duty_Cicle(RelayPWM * relay, uint8_t duty)
+{
+	relay->duty = duty;	
+}
+
 /*void resetPWMParts(SettingsType all_settings)
 {
 		//pwmParts = setting->part;
@@ -129,10 +215,10 @@ void Relay_Normal_Process(RelayNormal * relay, AllSettings * allSettings, float 
 int counter = 0;
 
 
-ISR(TIMER1_COMPA_vect)
+/*ISR(TIMER1_COMPA_vect)
 {
 	
-	/*if (pwmSetting==NULL)
+	if (pwmSetting==NULL)
 	{
 		RELAY_OFF( PWN_RELAY);
 		return;
@@ -144,8 +230,8 @@ ISR(TIMER1_COMPA_vect)
 	if (counter<=pwmSetting->period*pwmParts)
 		RELAY_ON( PWN_RELAY);
 	else
-		RELAY_OFF( PWN_RELAY);*/
-}
+		RELAY_OFF( PWN_RELAY);
+}*/
 
 /*void HandleRelay(SettingsType all_settings, float * temp, uint8_t relay)
 {

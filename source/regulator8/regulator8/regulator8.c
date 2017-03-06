@@ -55,6 +55,8 @@ void ShowSettings();
 void ShowRelayMenu();
 void ShowReset();
 
+void Init_Clock();
+
 typedef enum {PS_WORK, PS_MENU} ProgramState;
 
 ProgramState ps;
@@ -63,6 +65,7 @@ Menu menu;
 RelayNormal relayNormal1;
 RelayNormal relayNormal2;
 RelayNormal relayNormal3;
+RelayPWM relayPwm4;
 
 uint32_t iterations = 0;
 
@@ -79,19 +82,22 @@ void onPWMSignalChange()
 
 int main()
 {
+	On(RELAY_DDR, 4);		
 	ps = PS_WORK;
 	int turn = 0;
 	previousPWMSignal = readPWMSignal();
 	LCD_Init();
 	BTN_Init();
 	Settings_Init(&allSettings);
-	Relay_Init();
 	
 	Relay_Normal_Init(&relayNormal1, RELAY1);
 	Relay_Normal_Init(&relayNormal2, RELAY2);
 	Relay_Normal_Init(&relayNormal3, RELAY3);
+	Relay_PWM_Init(&relayPwm4, &allSettings, RELAY4);
 	
 	Menu_Init(&menu, &allSettings);
+	
+	Init_Clock();
 	
 	//resetPWMParts(all_settings);
 
@@ -157,6 +163,7 @@ void ShowMenu(MenuStatus ms)
 
 void HideMenu()
 {
+	Relay_PWM_Find_Active_Settings(&relayPwm4);
 	ps = PS_WORK;
 	sei();
 }
@@ -182,23 +189,14 @@ void DoWork()
 	DS_Init(DSBIT3);
 
 		temp[0] = DS_getFloatTemperature(DSBIT1);
-
-
-		//DS_Init(DSBIT2);
 		temp[1] = DS_getFloatTemperature(DSBIT2);
-
-
-		//DS_Init(DSBIT3);
 		temp[2] = DS_getFloatTemperature(DSBIT3);
 
 		
 		Relay_Normal_Process(&relayNormal1, &allSettings, temp);
 		Relay_Normal_Process(&relayNormal2, &allSettings, temp);
 		Relay_Normal_Process(&relayNormal3, &allSettings, temp);
-		/*HandleRelay(all_settings, temp, RELAY1);
-		HandleRelay(all_settings, temp, RELAY2);
-		HandleRelay(all_settings, temp, RELAY3);
-		HandleRelay(all_settings, temp, RELAY4);*/
+		Relay_PWM_Process(&relayPwm4, &allSettings, temp);
 		
 
 		LCD_2buffer_begin();
@@ -213,7 +211,7 @@ void DoWork()
 		LCD_2buffer_Show_FloatTemperature1(temp[2]);
 		
 		LCD_2buffer_Move_Cursor(24);
-		LCD_2buffer_Print_Number(/*pwmParts*/0);
+		LCD_2buffer_Print_Number(relayPwm4.counter_minute);
 		
 		LCD_2buffer_Move_Cursor(31);
 		char pwmSignalChar[2];
@@ -376,3 +374,40 @@ void BTN_Process()
 	}
 	
 }
+
+void Init_Clock()
+{
+	cli();             // disable global interrupts
+    TCCR1A = 0;        // set entire TCCR1A register to 0
+    TCCR1B = 0;
+ 
+	//OCR1A = 0x021D;
+	//OCR1A = 0x3F66/N_PARTS;
+	OCR1A = (F_CPU/1024 - 1)/N_PARTS;
+
+    TCCR1B |= (1 << WGM12);
+    // Mode 4, CTC on OCR1A
+
+    TIMSK1 |= (1 << OCIE1A);
+    //Set interrupt on compare match
+
+    TCCR1B |= (1 << CS12) | (1 << CS10);
+	
+	
+    sei();
+}
+
+
+
+ISR(TIMER1_COMPA_vect)
+{
+	Relay_PWM_Interrupt(&relayPwm4);
+	/*if (qqq)
+	{
+		On(RELAY_PORT, 4);		
+	}else
+	{
+		Off(RELAY_PORT, 4);		
+	}
+	qqq= !qqq;*/
+}	
