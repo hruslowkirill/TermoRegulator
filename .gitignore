@@ -1,0 +1,9 @@
+
+#exclude release dir except some files
+
+/source/regulator8/regulator8/Release/*
+!/source/regulator8/regulator8/Release/regulator8.eep
+!/source/regulator8/regulator8/Release/regulator8.bin
+!/source/regulator8/regulator8/Release/regulator8.hex
+!/source/regulator8/regulator8/Release/HEX2BIN.EXE
+!/source/regulator8/regulator8/Release/convertHex2Bin.bat

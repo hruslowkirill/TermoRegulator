@@ -1,10 +1,5 @@
 #include "relay.h"
 
-/*uint8_t isRelayOn[4][3] = {1};
-PWMSettings * pwmSetting = NULL;
-int8_t pwmParts = 0;
-uint8_t pwmPartsD = 0;
-uint8_t firstTime = 1;*/
 
 /*void Relay_Init()
 {
@@ -115,12 +110,11 @@ void Relay_PWM_Init(RelayPWM * relay, AllSettings * allSettings, uint8_t N)
 	relay->allSettings = allSettings;
 	Relay_PWM_Find_Active_Settings(relay);
 	
-	relay->isRelayOn[0] = 0;
-	relay->isRelayOn[1] = 0;
-	relay->isRelayOn[2] = 0;
-	
-	relay->duty = 0;
+	Relay_PWM_Set_Duty_Cicle(relay, 0);
 	relay->state = STATE0;
+	
+	relay->Tstart = 0;
+	relay->Tstop = 0;
 	
 	Relay_PWM_Reset_Counter_Cycle(relay);
 	Relay_PWM_Reset_Counter_M(relay);
@@ -128,15 +122,102 @@ void Relay_PWM_Init(RelayPWM * relay, AllSettings * allSettings, uint8_t N)
 	On(RELAY_DDR, relay->N);
 	RELAY_OFF(relay->N);
 }
-void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t PWMSignal)
+void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t overflowSignal)
 {
 	/*Relay_PWM_Set_Duty_Cicle(relay, 25);
 	return;*/
+		
+	PWMSettings * pwmSettings = Relay_PWM_GetCurrentPWMSettings(relay);
+	if (pwmSettings==NULL)
+		return;
+	
+	float td = temp[relay->activeSettings];
+	
 	switch (relay->state)
 	{
 		case STATE0:
-			
-		break;		
+			Relay_PWM_Set_Duty_Cicle(relay, 0);
+			relay->state = STATE1;
+		break;	
+		
+		case STATE1:
+			if (td >= pwmSettings->Tzap)
+			{
+				Relay_PWM_Reset_Counter_M(relay);
+				relay->state = STATE2;				
+			}
+		break;	
+		
+		case STATE2:
+			if (relay->counter_minute>=pwmSettings->t3)
+			{
+				relay->state = STATE3;				
+			}
+		break;
+		
+		case STATE3:
+			if (overflowSignal)
+			{
+				relay->state = STATE5;
+				relay->Tstop = td+pwmSettings->Tstop;
+				relay->Tstart = td+pwmSettings->Tstop-pwmSettings->Tstart;
+			}else
+			{
+				Relay_PWM_Set_Duty_Cicle(relay, pwmSettings->Sgshim);
+			}
+		break;
+		
+		case STATE5:
+			Relay_PWM_Set_Duty_Cicle(relay, pwmSettings->Scshim);
+			if (overflowSignal)
+			{
+				if (td>=pwmSettings->Tsliv)
+				{
+					relay->state = STATE6;
+				}
+			}else
+			{
+				relay->state = STATE0;
+			}
+		break;
+		
+		case STATE6:
+			Relay_PWM_Set_Duty_Cicle(relay, 0);
+			if (overflowSignal)
+			{
+				if (!(td > relay->Tstart))
+				{
+					relay->state = STATE7;
+				}
+			}else
+			{
+				relay->state = STATE0;
+			}
+		break;
+		
+		case STATE7:
+			Relay_PWM_Set_Duty_Cicle(relay, relay->Sshim);
+			if (overflowSignal)
+			{
+				if (td >= relay->Tstop)
+				{
+					relay->state = STATE8;
+				}
+			}else
+			{
+				relay->state = STATE0;
+			}
+		break;
+		
+		case STATE8:
+			relay->Sshim = relay->Sshim - pwmSettings->SshimD;
+			if (relay->Sshim < 1)
+			{
+				relay->Sshim = 1;				
+			}
+			Relay_PWM_Set_Duty_Cicle(relay, 0);
+			relay->state = STATE6;
+		break;
 	}
 }
 
@@ -190,6 +271,7 @@ void Relay_PWM_Find_Active_Settings(RelayPWM * relay)
 		if (relay->allSettings->PWMSettings[i].on)
 		{
 			relay->activeSettings = i;
+			relay->Sshim = relay->allSettings->PWMSettings[i].Sshim;
 			return;		
 		}		
 	}
@@ -200,186 +282,18 @@ void Relay_PWM_Set_Duty_Cicle(RelayPWM * relay, uint8_t duty)
 	relay->duty = duty;	
 }
 
-/*void resetPWMParts(SettingsType all_settings)
-{
-		//pwmParts = setting->part;
-		//pwmPartsD = setting->partD;
-		uint8_t q = readPWMSignal();
-		pwmParts = all_settings[0][q].pwmSettings.part;
-		pwmPartsD = all_settings[0][q].pwmSettings.partD;
-		//pwmParts = all_pwm_setting[q].part;
-		//pwmPartsD = all_pwm_setting[q].partD;
-		firstTime = 1;
-}*/
+
 
 int counter = 0;
 
 
-/*ISR(TIMER1_COMPA_vect)
-{
-	
-	if (pwmSetting==NULL)
-	{
-		RELAY_OFF( PWN_RELAY);
-		return;
-	}		
-	
-	counter++;
-	if (counter>(N_PARTS*pwmSetting->period))
-		counter = 1;
-	if (counter<=pwmSetting->period*pwmParts)
-		RELAY_ON( PWN_RELAY);
-	else
-		RELAY_OFF( PWN_RELAY);
-}*/
 
-/*void HandleRelay(SettingsType all_settings, float * temp, uint8_t relay)
+uint8_t readOverflowSignal()
 {
-	if (relay!=PWM_RELAY)
-	{
-		HandleRelayNormal(all_settings, temp, relay);
-	}else
-	{
-		//HandleRelayPWM(all_settings, temp, relay);
-	}			
-}
-
-void HandleRelayNormal(SettingsType all_settings, float * temp, uint8_t relay)
-{
-	Settings * setting;
-	uint8_t i;
-	for (i=0; i<3; i++)
-	{
-		setting = &all_settings[relay][i];
-		if (!setting->on)
-		{
-			isRelayOn[relay][i] = 0;
-			continue;				
-		}
-		if (setting->direction)//UP
-		{
-			if (temp[i]<(setting->temp))
-			{
-				//RELAY_OFF( relay);
-				isRelayOn[relay][i] = 0;
-			}
-			if (temp[i]>(setting->temp+setting->d))
-			{
-				isRelayOn[relay][i] = 1;
-			}
-		}else
-		{
-			if (temp[i]<(setting->temp-setting->d))
-			{
-				isRelayOn[relay][i] = 1;
-			}
-			if (temp[i]>(setting->temp))
-			{
-				isRelayOn[relay][i] = 0;
-			}
-		}
-	}
-	//uint8_t s = isRelayOn[relay][0]|isRelayOn[relay][1]|isRelayOn[relay][2];
-	uint8_t s = all_settings[relay][0].on|all_settings[relay][1].on|all_settings[relay][2].on;//0 if all are turned off
-	for (int i=0; i<3; i++)
-	{
-		if (!all_settings[relay][i].on)
-		{
-			continue;
-		}		
-		if (!isRelayOn[relay][i])
-			s = 0;
-	}
-	if (s)
-		RELAY_ON( relay);
-	else
-		RELAY_OFF( relay);
-}*/
-
-/*void HandleRelayPWM(SettingsType all_settings, float * temp, uint8_t relay)
-{
-	Settings * setting;
-	uint8_t q = readPWMSignal();
-	setting = &all_settings[relay][q];
-	uint8_t isOn = pwmSetting!=NULL;
-		if (!setting->on)
-		{
-			pwmSetting = NULL;	
-			pwmParts = 0;		
-		}else
-		{
-			if (setting->direction)//UP
-			{
-				if (temp[0]<(setting->temp))
-				{
-					isRelayOn[relay][q] = 0;
-				}
-				if (temp[0]>(setting->temp+setting->d))
-				{
-					isRelayOn[relay][q] = 1;
-				}
-			}else
-			{
-				if (temp[0]<(setting->temp-setting->d))
-				{
-					isRelayOn[relay][q] = 1;
-				}
-				if (temp[0]>(setting->temp))
-				{
-					isRelayOn[relay][q] = 0;
-				}
-			}
-			if (isRelayOn[relay][q])
-			{
-				
-				pwmSetting = &setting->pwmSettings;
-				if (!isOn)
-				{
-					if (!firstTime)
-					{
-						pwmParts = pwmParts-pwmPartsD;					
-					}
-					firstTime = 0;					
-				}							
-			}else
-			{
-				pwmSetting = NULL;				
-			}	
-			
-		}		
-}*/
-
-
-uint8_t readPWMSignal()
-{
-	if (RELAY_PIN & (1<<PWN_SIGNAL))
+	Off(RELAY_DDR, OVERFLOW_SIGNAL);
+	if (RELAY_PIN & (1<<OVERFLOW_SIGNAL))
 	{
 		return 1;		
 	}
 	return 0;
 }
-
-/*void HandleRelay(Settings * setting, float temp, uint8_t relay)
-{
-	if (setting->direction)//UP
-	{
-		if (temp<(setting->temp-setting->d))
-		{
-			RELAY_OFF( relay);
-		}
-		if (temp>(setting->temp))
-		{
-			RELAY_ON( relay);
-		}
-	}else
-	{
-		if (temp<(setting->temp))
-		{
-			RELAY_ON( relay);
-		}
-		if (temp>(setting->temp+setting->d))
-		{
-			RELAY_OFF( relay);
-		}
-	}
-}*/

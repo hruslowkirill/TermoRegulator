@@ -53,8 +53,9 @@ void Settings_Init(AllSettings * allSettings)
 		Settings_Read_PWM(allSettings, PWM_RELAY, i);
 		
 	/*TEMP!*/
-	allSettings->PWMSettings[0].on = 1;
+	/*allSettings->PWMSettings[0].on = 1;
 	allSettings->PWMSettings[0].tpwm = 10;
+	allSettings->PWMSettings[0].t3 = 1;*/
 }
 void Settings_Read_Normal(AllSettings * allSettings, uint8_t relay, uint8_t term)
 {

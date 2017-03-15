@@ -82,10 +82,10 @@ void onPWMSignalChange()
 
 int main()
 {
-	On(RELAY_DDR, 4);		
+	//On(RELAY_DDR, 4);		
 	ps = PS_WORK;
 	int turn = 0;
-	previousPWMSignal = readPWMSignal();
+	previousPWMSignal = readOverflowSignal();
 	LCD_Init();
 	BTN_Init();
 	Settings_Init(&allSettings);
@@ -98,7 +98,7 @@ int main()
 	Menu_Init(&menu, &allSettings);
 	
 	Init_Clock();
-	
+	ledON;
 	//resetPWMParts(all_settings);
 
 
@@ -115,7 +115,7 @@ int main()
 	}*/
 	while (1)
 	{
-		uint8_t q = readPWMSignal();
+		uint8_t q = readOverflowSignal();
 		if (q!=previousPWMSignal)
 		{
 			onPWMSignalChange();			
@@ -188,39 +188,47 @@ void DoWork()
 	DS_Init(DSBIT2);
 	DS_Init(DSBIT3);
 
-		temp[0] = DS_getFloatTemperature(DSBIT1);
-		temp[1] = DS_getFloatTemperature(DSBIT2);
-		temp[2] = DS_getFloatTemperature(DSBIT3);
+	temp[0] = DS_getFloatTemperature(DSBIT1);
+	temp[1] = DS_getFloatTemperature(DSBIT2);
+	temp[2] = DS_getFloatTemperature(DSBIT3);
+		
+	uint8_t overflowSignal = readOverflowSignal();
 
 		
-		Relay_Normal_Process(&relayNormal1, &allSettings, temp);
-		Relay_Normal_Process(&relayNormal2, &allSettings, temp);
-		Relay_Normal_Process(&relayNormal3, &allSettings, temp);
-		Relay_PWM_Process(&relayPwm4, &allSettings, temp);
+	Relay_Normal_Process(&relayNormal1, &allSettings, temp);
+	Relay_Normal_Process(&relayNormal2, &allSettings, temp);
+	Relay_Normal_Process(&relayNormal3, &allSettings, temp);
+	Relay_PWM_Process(&relayPwm4, temp, overflowSignal);
 		
 
-		LCD_2buffer_begin();
-		//LCD_Clear_Display();
-		LCD_2buffer_Move_Cursor(0);
-		LCD_2buffer_Show_FloatTemperature1(temp[0]);
+	LCD_2buffer_begin();
+	//LCD_Clear_Display();
+	LCD_2buffer_Move_Cursor(0);
+	LCD_2buffer_Show_FloatTemperature1(temp[0]);
 
-		LCD_2buffer_Move_Cursor(8);
-		LCD_2buffer_Show_FloatTemperature1(temp[1]);
+	LCD_2buffer_Move_Cursor(8);
+	LCD_2buffer_Show_FloatTemperature1(temp[1]);
 
-		LCD_2buffer_Move_Cursor(16);
-		LCD_2buffer_Show_FloatTemperature1(temp[2]);
+	LCD_2buffer_Move_Cursor(16);
+	LCD_2buffer_Show_FloatTemperature1(temp[2]);
 		
-		LCD_2buffer_Move_Cursor(24);
-		LCD_2buffer_Print_Number(relayPwm4.counter_minute);
+	LCD_2buffer_Move_Cursor(24);
+	LCD_2buffer_Print_Number(relayPwm4.state);
+	
+	LCD_2buffer_Move_Cursor(26);
+	LCD_2buffer_Print_Number(relayPwm4.counter_minute);
+	
+	LCD_2buffer_Move_Cursor(29);
+	LCD_2buffer_Print_Number(relayPwm4.duty);
 		
-		LCD_2buffer_Move_Cursor(31);
-		char pwmSignalChar[2];
-		pwmSignalChar[1] = '\0';
-		if (readPWMSignal())
-			pwmSignalChar[0] = '+';
-		else
-			pwmSignalChar[0] = '-';
-		LCD_2buffer_printStr(pwmSignalChar);
+	LCD_2buffer_Move_Cursor(31);
+	char pwmSignalChar[2];
+	pwmSignalChar[1] = '\0';
+	if (overflowSignal)
+		pwmSignalChar[0] = '+';
+	else
+		pwmSignalChar[0] = '-';
+	LCD_2buffer_printStr(pwmSignalChar);
 		
 		/*LCD_2buffer_Move_Cursor(24);
 		uint8_t i;
@@ -232,9 +240,9 @@ void DoWork()
 				LCD_2buffer_printStr("0");			
 		}*/
 		
-		LCD_2buffer_end();
-		iterations = 1;
-		_delay_us(100);
+	LCD_2buffer_end();
+	iterations = 1;
+	_delay_us(100);
 }
 
 
@@ -297,6 +305,8 @@ void BTN_Init()
 	On(BTNPORT, BTN1); 
 	On(BTNPORT, BTN2); 
 	On(BTNPORT, BTN3); 
+	
+	
 
 	//Led_On_time = 0;
 }

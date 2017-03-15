@@ -22,7 +22,7 @@
 
 #define PWM_RELAY RELAY4
 
-#define PWN_SIGNAL 5
+#define OVERFLOW_SIGNAL 5
 
 
 #define Off(PORT, N) PORT &= ~(1<<N)
