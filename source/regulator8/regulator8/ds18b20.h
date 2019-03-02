@@ -16,6 +16,8 @@ uint16_t DS_getTemperature(byte DSBIT);
 float DS_getFloatTemperature(byte DSBIT);
 void DS_Send_Byte(byte DSBIT, byte b);
 byte DS_Read_Bit(byte DSBIT );
-byte DS_Read_Byte(byte DSBIT);	
+byte DS_Read_Byte(byte DSBIT);
+
+byte DS_Termometr_Bit_By_Number(byte number);	
 	
 #endif

@@ -4,6 +4,7 @@
 #include "defines.h"
 #include <avr/interrupt.h>
 #include "settings.h"
+#include "ds18b20.h"
 
 #define N_PARTS 50
 
@@ -40,13 +41,14 @@ void Relay_Normal_Init(RelayNormal * relay, uint8_t N);
 void Relay_Normal_Process(RelayNormal * relay, AllSettings * allSettings, float * temp);
 
 void Relay_PWM_Init(RelayPWM * relay, AllSettings * allSettings, uint8_t N);
-void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t overflowSignal);
+void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t overflowSignal, float * tempMedian);
 void Relay_PWM_Interrupt(RelayPWM * relay);
 void Relay_PWM_Reset_Counter_Cycle(RelayPWM * relay);
 void Relay_PWM_Reset_Counter_M(RelayPWM * relay);
 PWMSettings * Relay_PWM_GetCurrentPWMSettings(RelayPWM * relay);
 void Relay_PWM_Find_Active_Settings(RelayPWM * relay);
 void Relay_PWM_Set_Duty_Cicle(RelayPWM * relay, uint8_t duty);
+float Relat_PWM_Get_Median(float a, float b, float c);
 
 
 //void Relay_Init();

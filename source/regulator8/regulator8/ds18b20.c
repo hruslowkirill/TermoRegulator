@@ -135,3 +135,22 @@ byte DS_Read_Byte(byte DSBIT)
 	}
 	return b;
 }
+
+byte DS_Termometr_Bit_By_Number(byte number)
+{
+	byte res = 0;
+	switch (number)
+	{
+		case 0:
+			res = DSBIT1;
+		break;		
+		case 1:
+			res = DSBIT2;
+		break;	
+		case 2:
+			res = DSBIT3;
+		break;	
+	}	
+	
+	return res;	
+}

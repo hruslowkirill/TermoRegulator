@@ -72,12 +72,29 @@ uint32_t iterations = 0;
 
 float temp[3];
 
+float tempMedian;
+
 
 uint8_t previousPWMSignal;
 
 void onPWMSignalChange()
 {
 	//resetPWMParts(all_settings);
+}
+
+int main1()
+{
+	BTN_Init();
+	//Init_Clock();
+	
+	DDRD = 0xFF;
+	PORTD = 0;
+	
+	while (1)
+	{
+		BTN_Process();
+		_delay_ms(1);
+	}		
 }
 
 int main()
@@ -198,7 +215,7 @@ void DoWork()
 	Relay_Normal_Process(&relayNormal1, &allSettings, temp);
 	Relay_Normal_Process(&relayNormal2, &allSettings, temp);
 	Relay_Normal_Process(&relayNormal3, &allSettings, temp);
-	Relay_PWM_Process(&relayPwm4, temp, overflowSignal);
+	Relay_PWM_Process(&relayPwm4, temp, overflowSignal, &tempMedian);
 		
 
 	LCD_2buffer_begin();
@@ -206,11 +223,21 @@ void DoWork()
 	LCD_2buffer_Move_Cursor(0);
 	LCD_2buffer_Show_FloatTemperature1(temp[0]);
 
-	LCD_2buffer_Move_Cursor(8);
+	LCD_2buffer_Move_Cursor(5);
 	LCD_2buffer_Show_FloatTemperature1(temp[1]);
+	
+	LCD_2buffer_Move_Cursor(10);
+	LCD_2buffer_Show_FloatTemperature1(temp[2]);
+	
 
 	LCD_2buffer_Move_Cursor(16);
-	LCD_2buffer_Show_FloatTemperature1(temp[2]);
+		if (tempMedian>-80)
+	{
+		LCD_2buffer_Show_FloatTemperature1(tempMedian);		
+	}else
+	{
+		LCD_2buffer_printStr("--");		
+	}
 		
 	LCD_2buffer_Move_Cursor(24);
 	LCD_2buffer_Print_Number(relayPwm4.state);
@@ -244,8 +271,41 @@ void DoWork()
 	iterations = 1;
 	_delay_us(100);
 }
+/*
+void BTN1_Pressed()
+{
+	PORTD ^= _BV(PD0); 
+	iterations = 0;
+}
+void BTN2_Pressed()
+{
+	PORTD = 0b00000010;
+	iterations = 0;
+}
+void BTN3_Pressed()
+{
+	PORTD = 0b00000100;
+	iterations = 0;
+}
+void BTN1_Long_Pressed()
+{
+	PORTD = 0b00001000;
+	iterations = 0;
+}
 
+void BTN2_Long_Pressed()
+{
+	PORTD = 0b00100000;	
+	iterations = 0;
+}
 
+void BTN3_Long_Pressed()
+{
+	PORTD = 0b01000000;
+	iterations=0;
+}
+
+*/
 void BTN1_Pressed()
 {
 	Menu_BtnMinusPressed(&menu);
@@ -281,7 +341,6 @@ void BTN2_Long_Pressed()
 
 void BTN3_Long_Pressed()
 {
-
 	if (ps==PS_WORK)
 	{
 		ShowMenu(MS_RELAY);		

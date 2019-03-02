@@ -111,6 +111,8 @@ void Relay_PWM_Init(RelayPWM * relay, AllSettings * allSettings, uint8_t N)
 	Relay_PWM_Find_Active_Settings(relay);
 	
 	Relay_PWM_Set_Duty_Cicle(relay, 0);
+	
+	//TODO
 	relay->state = STATE0;
 	
 	relay->Tstart = 0;
@@ -122,7 +124,7 @@ void Relay_PWM_Init(RelayPWM * relay, AllSettings * allSettings, uint8_t N)
 	On(RELAY_DDR, relay->N);
 	RELAY_OFF(relay->N);
 }
-void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t overflowSignal)
+void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t overflowSignal, float * tempMedian)
 {
 	/*Relay_PWM_Set_Duty_Cicle(relay, 25);
 	return;*/
@@ -137,6 +139,7 @@ void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t overflowSignal)
 	{
 		case STATE0:
 			Relay_PWM_Set_Duty_Cicle(relay, 0);
+			*tempMedian = -90;
 			relay->state = STATE1;
 		break;	
 		
@@ -159,8 +162,17 @@ void Relay_PWM_Process(RelayPWM * relay, float * temp, uint8_t overflowSignal)
 			if (overflowSignal)
 			{
 				relay->state = STATE5;
-				relay->Tstop = td+pwmSettings->Tstop;
-				relay->Tstart = td+pwmSettings->Tstop-pwmSettings->Tstart;
+				
+				byte TempBit = DS_Termometr_Bit_By_Number(relay->activeSettings);
+				
+				float t1 = DS_getFloatTemperature(TempBit);
+				float t2 = DS_getFloatTemperature(TempBit);
+				
+				*tempMedian = Relat_PWM_Get_Median(td, t1, t2);
+				
+				
+				relay->Tstop = *tempMedian+pwmSettings->Tstop;
+				relay->Tstart = *tempMedian+pwmSettings->Tstop-pwmSettings->Tstart;
 			}else
 			{
 				Relay_PWM_Set_Duty_Cicle(relay, pwmSettings->Sgshim);
@@ -296,4 +308,15 @@ uint8_t readOverflowSignal()
 		return 1;		
 	}
 	return 0;
+}
+
+
+float Relat_PWM_Get_Median(float a, float b, float c)
+{
+	 if ( (a - b) * (c - a) >= 0 ) // a >= b and a <= c OR a <= b and a >= c
+        return a;
+    else if ( (b - a) * (c - b) >= 0 ) // b >= a and b <= c OR b <= a and b >= c
+        return b;
+    else
+        return c;	
 }

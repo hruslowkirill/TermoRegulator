@@ -25,7 +25,7 @@
 #define Select_DataRegister	    	CONTROL_PORT|=_BV(RegSelect_Pin)
 #define ledON                       CONTROL_PORT|=_BV(Led_Pin)
 #define ledOFF                      CONTROL_PORT&=~_BV(Led_Pin)
-
+#define ledToogle                   CONTROL_PORT^= _BV(Led_Pin)
 
 
 void LCD_Show_FloatTemperature1(float f);
